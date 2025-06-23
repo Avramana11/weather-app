@@ -11,7 +11,8 @@ const App = () => {
   const [unit, setUnit] = useState('C');
   const [error,setError] =useState('');
 
-  const API_KEY = '0343fbcbf52bfcd5f3e8f6f78a03f3ec'
+  // const API_KEY = '0343fbcbf52bfcd5f3e8f6f78a03f3ec'
+  const API_KEY = import.meta.env.VITE_API_KEY;
   
   // https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
   //https://api.openweathermap.org/data/2.5/weather?lat=${s.lat}&lon={s.lon}&appid={API key}&appid={API_KEY}&units=metric
@@ -19,6 +20,7 @@ const App = () => {
 useEffect(() => {
   if(city.trim().length >= 3 && ! weather){
     const timer = setTimeout(() => fetchSuggestions(city), 500);
+    return () => clearTimeout(timer);
   }
   setSuggestion([]);
 }, [city, weather]);
@@ -84,7 +86,7 @@ const fetchSuggestions = async (query) => {
                     <input value={city} onChange={(e) => setCity(e.target.value)} placeholder='Enter a city name' className=' mb-4 p-3 rounded border border-white bg-transparent text-white placeholder-white focus:outline-none focus:border-blue-300 transition duration-300'/>
                     {suggestion.length > 0 && (
                       <div className=' absolute top-12 left-0 right-0 bg-transparent shadow-md rounded z-10'>
-                          {suggestion.map((s) => {
+                          {suggestion.map((s) => (
                             <button type='button' key={`${s.lat}-${s.lon}`}
                             onClick={()=> fetchWeatherData(
                               `https://api.openweathermap.org/data/2.5/weather?lat=${s.lat}&lon=${s.lon}&appid=${API_KEY}&units=metric`,
@@ -92,7 +94,7 @@ const fetchSuggestions = async (query) => {
                             )} className='block hover:bg-blue-700 bg-transparent px-4 py-2 text-sm text-left w-full transition-colors'>
                                 {s.name}, {s.country} {s.state && `,${s.state}`}
                             </button>
-                          })}
+                          ))}
                       </div>
                     )}
                     <button type="submit" className='bg-purple-700 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors'>
